@@ -9,11 +9,12 @@
   ],
   "scripts": {
     "build": "yarn run clean && yarn run compile",
-    "clean": "rimraf -rf ./lib",
+    "clean": "rimraf lib/**",
     "compile": "tsc -p tsconfig.build.json",
-    "prepublishOnly": "yarn run build",
+    "prepublishOnly": "yarn build",
     "test": "jest",
-    "generate-rosetta-types": "openapi-typescript https://raw.githubusercontent.com/coinbase/rosetta-specifications/master/api.json --output ./src/types/rosetta.d.ts"
+    "generate-rosetta-types": "openapi-typescript https://raw.githubusercontent.com/coinbase/rosetta-specifications/master/api.json --output ./src/types/rosetta.d.ts",
+    "lint": "eslint \"{src,__tests__}/**/*.ts\" --fix"
   },
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
