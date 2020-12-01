@@ -13,7 +13,7 @@
     "compile": "tsc -p tsconfig.build.json",
     "prepublishOnly": "yarn run build",
     "test": "jest",
-    "generate-rosetta-types": "dtsgen --out ./src/types/rosetta-types.d.ts ./src/open-api.json && prettier --write ./src/types/rosetta-types.d.ts"
+    "generate-rosetta-types": "openapi-typescript https://raw.githubusercontent.com/coinbase/rosetta-specifications/master/api.json --output ./src/types/rosetta.d.ts"
   },
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",

@@ -1,62 +1,59 @@
 import axios from "axios";
+import * as rosetta from "./types/rosetta";
+import * as utils from "./utils";
 
 export class RosettaClient {
   _baseUrl: string;
+  _headers: { [key: string]: string };
 
-  setBaseUrl = (url: string): void => {
-    this._baseUrl = url;
-  };
-
-  getBaseUrl = (): string => {
-    return this._baseUrl;
-  };
+  constructor(baseUrl: string, headers?: { [key: string]: string }) {
+    this._baseUrl = baseUrl;
+    this._headers = headers ? headers : {};
+  }
 
   /**********************************************
    ** Data Endpoints
    **********************************************/
 
-  accountBalance = async <T>(
-    req: Components.Schemas.AccountBalanceRequest
-  ): Promise<Components.Schemas.AccountBalanceResponse<T>> => {
+  accountBalance = async (
+    req: rosetta.AccountBalanceRequest
+  ): Promise<rosetta.AccountBalanceResponse> => {
     try {
-      const body: Components.Schemas.AccountBalanceRequest = {
-        network_identifier: req.account_identifier,
-        account_identifier: req.account_identifier,
-      };
-
-      if (req.block_identifier) {
-        body.block_identifier = req.block_identifier;
-      }
-
       const response = await axios.post(
         `${this._baseUrl}/account/balance`,
-        body
+        req
       );
-      const data: Components.Schemas.AccountBalanceResponse<T> = response.data;
+      const data: rosetta.AccountBalanceResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  accountCoins = async <T>(
-    req: Components.Schemas.AccountCoinsRequest
-  ): Promise<Components.Schemas.AccountCoinsResponse<T>> => {
+  accountCoins = async (
+    req: rosetta.AccountCoinsRequest
+  ): Promise<rosetta.AccountCoinsResponse> => {
     try {
-      const response = await axios.post(`${this._baseUrl}/account/coins`, req);
-      const data: Components.Schemas.AccountCoinsResponse<T> = response.data;
+      const response = await axios.post(
+        `${this._baseUrl}/account/coins`,
+        req,
+        utils.setCustomHeaders(this._headers)
+      );
+      const data: rosetta.AccountCoinsResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  block = async (
-    req: Components.Schemas.BlockRequest
-  ): Promise<Components.Schemas.BlockResponse> => {
+  block = async (req: rosetta.BlockRequest): Promise<rosetta.BlockResponse> => {
     try {
-      const response = await axios.post(`${this._baseUrl}/block`, req);
-      const data: Components.Schemas.BlockResponse = response.data;
+      const response = await axios.post(
+        `${this._baseUrl}/block`,
+        req,
+        utils.setCustomHeaders(this._headers)
+      );
+      const data: rosetta.BlockResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
@@ -64,81 +61,95 @@ export class RosettaClient {
   };
 
   blockTransaction = async (
-    req: Components.Schemas.BlockTransactionRequest
-  ): Promise<Components.Schemas.BlockTransactionResponse> => {
+    req: rosetta.BlockTransactionRequest
+  ): Promise<rosetta.BlockTransactionResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/block/transaction`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.BlockTransactionResponse = response.data;
+      const data: rosetta.BlockTransactionResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  networksList = async <T>(
-    req?: Components.Schemas.MetadataRequest<T>
-  ): Promise<Components.Schemas.NetworkListResponse> => {
+  networksList = async (
+    req?: rosetta.MetadataRequest
+  ): Promise<rosetta.NetworkListResponse> => {
     try {
-      const response = await axios.post(`${this._baseUrl}/network/list`, req);
-      const lunarRes: Components.Schemas.NetworkListResponse = response.data;
+      const response = await axios.post(
+        `${this._baseUrl}/network/list`,
+        req,
+        utils.setCustomHeaders(this._headers)
+      );
+      const lunarRes: rosetta.NetworkListResponse = response.data;
       return lunarRes;
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  networkOptions = async <T>(
-    req: Components.Schemas.NetworkRequest<T>
-  ): Promise<Components.Schemas.NetworkOptionsResponse> => {
+  networkOptions = async (
+    req: rosetta.NetworkRequest
+  ): Promise<rosetta.NetworkOptionsResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/network/options`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.NetworkOptionsResponse = response.data;
+      const data: rosetta.NetworkOptionsResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  networkStatus = async <T>(
-    req: Components.Schemas.NetworkRequest<T>
-  ): Promise<Components.Schemas.NetworkStatusResponse> => {
+  networkStatus = async (
+    req: rosetta.NetworkRequest
+  ): Promise<rosetta.NetworkStatusResponse> => {
     try {
-      const response = await axios.post(`${this._baseUrl}/network/status`, req);
-      const data: Components.Schemas.NetworkStatusResponse = response.data;
+      const response = await axios.post(
+        `${this._baseUrl}/network/status`,
+        req,
+        utils.setCustomHeaders(this._headers)
+      );
+      const data: rosetta.NetworkStatusResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  mempool = async <T>(
-    req: Components.Schemas.NetworkRequest<T>
-  ): Promise<Components.Schemas.MempoolResponse> => {
+  mempool = async (
+    req: rosetta.NetworkRequest
+  ): Promise<rosetta.MempoolResponse> => {
     try {
-      const response = await axios.post(`${this._baseUrl}/mempool`, req);
-      const data: Components.Schemas.MempoolResponse = response.data;
+      const response = await axios.post(
+        `${this._baseUrl}/mempool`,
+        req,
+        utils.setCustomHeaders(this._headers)
+      );
+      const data: rosetta.MempoolResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  mempoolTransaction = async <T>(
-    req: Components.Schemas.MempoolTransactionRequest
-  ): Promise<Components.Schemas.MempoolTransactionResponse<T>> => {
+  mempoolTransaction = async (
+    req: rosetta.MempoolTransactionRequest
+  ): Promise<rosetta.MempoolTransactionResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/mempool/transaction`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.MempoolTransactionResponse<T> =
-        response.data;
+      const data: rosetta.MempoolTransactionResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
@@ -150,47 +161,47 @@ export class RosettaClient {
    **********************************************/
 
   combine = async (
-    req: Components.Schemas.ConstructionCombineRequest
-  ): Promise<Components.Schemas.ConstructionCombineResponse> => {
+    req: rosetta.ConstructionCombineRequest
+  ): Promise<rosetta.ConstructionCombineResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/combine`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.ConstructionCombineResponse =
-        response.data;
+      const data: rosetta.ConstructionCombineResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  derive = async <T, U>(
-    req: Components.Schemas.ConstructionDeriveRequest<T>
-  ): Promise<Components.Schemas.ConstructionDeriveResponse<U>> => {
+  derive = async (
+    req: rosetta.ConstructionDeriveRequest
+  ): Promise<rosetta.ConstructionDeriveResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/derive`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.ConstructionDeriveResponse<U> =
-        response.data;
+      const data: rosetta.ConstructionDeriveResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  hash = async <T>(
-    req: Components.Schemas.ConstructionHashRequest
-  ): Promise<Components.Schemas.TransactionIdentifierResponse<T>> => {
+  hash = async (
+    req: rosetta.ConstructionHashRequest
+  ): Promise<rosetta.TransactionIdentifierResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/hash`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.TransactionIdentifierResponse<T> =
-        response.data;
+      const data: rosetta.TransactionIdentifierResponse = response.data;
 
       return data;
     } catch (error) {
@@ -198,16 +209,16 @@ export class RosettaClient {
     }
   };
 
-  metadata = async <T, U>(
-    req: Components.Schemas.ConstructionMetadataRequest<T>
-  ): Promise<Components.Schemas.ConstructionMetadataResponse<U>> => {
+  metadata = async (
+    req: rosetta.ConstructionMetadataRequest
+  ): Promise<rosetta.ConstructionMetadataResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/metadata`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.ConstructionMetadataResponse<U> =
-        response.data;
+      const data: rosetta.ConstructionMetadataResponse = response.data;
 
       return data;
     } catch (error) {
@@ -215,16 +226,16 @@ export class RosettaClient {
     }
   };
 
-  parse = async <T>(
-    req: Components.Schemas.ConstructionParseRequest
-  ): Promise<Components.Schemas.ConstructionParseResponse<T>> => {
+  parse = async (
+    req: rosetta.ConstructionParseRequest
+  ): Promise<rosetta.ConstructionParseResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/parse`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.ConstructionParseResponse<T> =
-        response.data;
+      const data: rosetta.ConstructionParseResponse = response.data;
 
       return data;
     } catch (error) {
@@ -232,16 +243,16 @@ export class RosettaClient {
     }
   };
 
-  payloads = async <T>(
-    req: Components.Schemas.ConstructionPayloadsRequest<T>
-  ): Promise<Components.Schemas.ConstructionPayloadsResponse> => {
+  payloads = async (
+    req: rosetta.ConstructionPayloadsRequest
+  ): Promise<rosetta.ConstructionPayloadsResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/payloads`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.ConstructionPayloadsResponse =
-        response.data;
+      const data: rosetta.ConstructionPayloadsResponse = response.data;
 
       return data;
     } catch (error) {
@@ -249,16 +260,16 @@ export class RosettaClient {
     }
   };
 
-  preprocess = async <T, U>(
-    req: Components.Schemas.ConstructionPreprocessRequest<T>
-  ): Promise<Components.Schemas.ConstructionPreprocessResponse<U>> => {
+  preprocess = async (
+    req: rosetta.ConstructionPreprocessRequest
+  ): Promise<rosetta.ConstructionPreprocessResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/preprocess`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.ConstructionPreprocessResponse<U> =
-        response.data;
+      const data: rosetta.ConstructionPreprocessResponse = response.data;
 
       return data;
     } catch (error) {
@@ -266,16 +277,16 @@ export class RosettaClient {
     }
   };
 
-  submit = async <T>(
-    req: Components.Schemas.ConstructionSubmitRequest
-  ): Promise<Components.Schemas.TransactionIdentifierResponse<T>> => {
+  submit = async (
+    req: rosetta.ConstructionSubmitRequest
+  ): Promise<rosetta.TransactionIdentifierResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/submit`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
-      const data: Components.Schemas.TransactionIdentifierResponse<T> =
-        response.data;
+      const data: rosetta.TransactionIdentifierResponse = response.data;
 
       return data;
     } catch (error) {
