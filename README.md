@@ -21,15 +21,25 @@ yarn add @lunarhq/rosetta-ts-client
 
 ## Usage
 
-Create a new client. Both `baseUrl` and `headers` are optional. If no `baseUrl` is provided, the client will use [lunar.dev](https://lunar.dev).
+Create a new client. Both `baseUrl` and `headers` are optional. If no `baseUrl` is provided, the client will default to [lunar.dev](https://lunar.dev).
 ```ts
 import { RosettaClient } from '@lunarhq/rosetta-ts-client';
 
+/**
+ * Initialize Client
+ * RosettaClient params are optional
+ */ 
 const baseUrl = 'https://api.lunar.dev/v1/';
 const headers = {
   'X-Api-Key': 'XXXXXXXXXX'
 }
 const client = new RosettaClient({baseUrl, headers});
+
+/**
+ * Get list of available networks
+ */ 
+const metadata = {}
+const networks = await client.networksList(metadata)
 ```
 
 ### Data Endpoints
