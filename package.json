@@ -1,0 +1,49 @@
+{
+  "name": "@lunarhq/rosetta-ts",
+  "version": "0.0.1",
+  "main": "lib/index",
+  "types": "lib/index",
+  "license": "MIT",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "yarn run clean && yarn run compile",
+    "clean": "rimraf -rf ./lib",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "yarn run build",
+    "test": "jest",
+    "generate-rosetta-types": "dtsgen --out ./src/types/rosetta-types.d.ts ./src/open-api.json && prettier --write ./src/types/rosetta-types.d.ts"
+  },
+  "devDependencies": {
+    "@rollup/plugin-json": "^4.1.0",
+    "@types/jest": "^26.0.14",
+    "@typescript-eslint/eslint-plugin": "^4.3.0",
+    "@typescript-eslint/parser": "^4.3.0",
+    "dtsgenerator": "3.1.1",
+    "eslint": "^7.10.0",
+    "eslint-config-prettier": "^6.12.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.3.0",
+    "jest": "^26.4.2",
+    "lint-staged": "^10.4.0",
+    "prettier": "^2.1.2",
+    "rimraf": "~3.0.2",
+    "rollup": "^2.27.1",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-peer-deps-external": "^2.2.3",
+    "rollup-plugin-typescript2": "^0.27.2",
+    "ts-jest": "^26.4.1",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "axios": "^0.21.0",
+    "i": "^0.3.6",
+    "nock": "^13.0.5",
+    "npm": "^6.14.9",
+    "openapi-typescript": "^2.4.2"
+  }
+}

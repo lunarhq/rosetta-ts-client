@@ -1,0 +1,14 @@
+{
+    "extends": "./tsconfig.build.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+        "@lunarhq/*": ["packages/*"]
+        },
+        "jsx": "react",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "types": ["jest", "node"]
+    }
+}
+  
