@@ -2,13 +2,23 @@ import axios from "axios";
 import * as rosetta from "./types/rosetta";
 import * as utils from "./utils";
 
+interface RosettaClientParams {
+  baseUrl?: string;
+  headers: {
+    [key: string]: string;
+  };
+}
+
 export class RosettaClient {
   _baseUrl: string;
   _headers: { [key: string]: string };
 
-  constructor(baseUrl?: string, headers?: { [key: string]: string }) {
-    this._baseUrl = baseUrl ?? "https://api.lunar.dev/v1/";
-    this._headers = headers ?? {};
+  constructor({
+    baseUrl = "https://api.lunar.dev/v1/",
+    headers = {},
+  }: RosettaClientParams) {
+    this._baseUrl = baseUrl;
+    this._headers = headers;
   }
 
   /**********************************************
@@ -77,7 +87,7 @@ export class RosettaClient {
   };
 
   networksList = async (
-    req?: rosetta.MetadataRequest
+    req: rosetta.MetadataRequest
   ): Promise<rosetta.NetworkListResponse> => {
     try {
       const response = await axios.post(
