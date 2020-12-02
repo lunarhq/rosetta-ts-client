@@ -40,21 +40,22 @@ export class RosettaClient {
     }
   };
 
-  accountCoins = async (
-    req: rosetta.AccountCoinsRequest
-  ): Promise<rosetta.AccountCoinsResponse> => {
-    try {
-      const response = await axios.post(
-        `${this._baseUrl}/account/coins`,
-        req,
-        utils.setCustomHeaders(this._headers)
-      );
-      const data: rosetta.AccountCoinsResponse = response.data;
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
+  // // from release v1.4.7
+  // accountCoins = async (
+  //   req: rosetta.AccountCoinsRequest
+  // ): Promise<rosetta.AccountCoinsResponse> => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${this._baseUrl}/account/coins`,
+  //       req,
+  //       utils.setCustomHeaders(this._headers)
+  //     );
+  //     const data: rosetta.AccountCoinsResponse = response.data;
+  //     return data;
+  //   } catch (error) {
+  //     return Promise.reject(error);
+  //   }
+  // };
 
   block = async (req: rosetta.BlockRequest): Promise<rosetta.BlockResponse> => {
     try {

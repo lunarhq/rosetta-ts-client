@@ -114,7 +114,7 @@ export interface Transaction {
 }
 
 /**
- * Operations contain all balance-changing information within a transaction. They are always one-sided (only affect 1 AccountIdentifier) and can succeed or fail independently from a Transaction. Operations are used both to represent on-chain data (Data API) and to construct new transactions (Construction API), creating a standard interface for reading and writing to blockchains.
+ * Operations contain all balance-changing information within a transaction. They are always one-sided (only affect 1 AccountIdentifier) and can succeed or fail independently from a Transaction.
  */
 export interface Operation {
   operation_identifier: OperationIdentifier;
@@ -123,13 +123,13 @@ export interface Operation {
    */
   related_operations?: OperationIdentifier[];
   /**
-   * Type is the network-specific type of the operation. Ensure that any type that can be returned here is also specified in the NetworkOptionsResponse. This can be very useful to downstream consumers that parse all block data.
+   * The network-specific type of the operation. Ensure that any type that can be returned here is also specified in the NetworkStatus. This can be very useful to downstream consumers that parse all block data.
    */
   type: string;
   /**
-   * Status is the network-specific status of the operation. Status is not defined on the transaction object because blockchains with smart contracts may have transactions that partially apply (some operations are successful and some are not). Blockchains with atomic transactions (all operations succeed or all operations fail) will have the same status for each operation. On-chain operations (operations retrieved in the `/block` and `/block/transaction` endpoints) MUST have a populated status field (anything on-chain must have succeeded or failed). However, operations provided during transaction construction (often times called "intent" in the documentation) MUST NOT have a populated status field (operations yet to be included on-chain have not yet succeeded or failed).
+   * The network-specific status of the operation. Status is not defined on the transaction object because blockchains with smart contracts may have transactions that partially apply. Blockchains with atomic transactions (all operations succeed or all operations fail) will have the same status for each operation.
    */
-  status?: string;
+  status: string;
   account?: AccountIdentifier;
   amount?: Amount;
   coin_change?: CoinChange;
@@ -191,6 +191,7 @@ export interface Peer {
   peer_id: string;
   metadata?: { [key: string]: any };
 }
+
 /**
  * The Version object is utilized to inform the client of the versions of different components of the Rosetta implementation.
  */
@@ -233,22 +234,6 @@ export interface Allow {
    * Any Rosetta implementation that supports querying the balance of an account at any height in the past should set this to true.
    */
   historical_balance_lookup: boolean;
-  /**
-   * If populated, `timestamp_start_index` indicates the first block index where block timestamps are considered valid (i.e. all blocks less than `timestamp_start_index` could have invalid timestamps). This is useful when the genesis block (or blocks) of a network have timestamp 0. If not populated, block timestamps are assumed to be valid for all available blocks.
-   */
-  timestamp_start_index?: number;
-  /**
-   * All methods that are supported by the /call endpoint. Communicating which parameters should be provided to /call is the responsibility of the implementer (this is en lieu of defining an entire type system and requiring the implementer to define that in Allow).
-   */
-  call_methods: string[];
-  /**
-   * BalanceExemptions is an array of BalanceExemption indicating which account balances could change without a corresponding Operation. BalanceExemptions should be used sparingly as they may introduce significant complexity for integrators that attempt to reconcile all account balance changes. If your implementation relies on any BalanceExemptions, you MUST implement historical balance lookup (the ability to query an account balance at any BlockIdentifier).
-   */
-  balance_exemptions: BalanceExemption[];
-  /**
-   * Any Rosetta implementation that can update an AccountIdentifier's unspent coins based on the contents of the mempool should populate this field as true. If false, requests to `/account/coins` that set `include_mempool` as true will be automatically rejected.
-   */
-  mempool_coins: boolean;
 }
 
 /**
@@ -269,7 +254,6 @@ export interface OperationStatus {
  * The timestamp of the block in milliseconds since the Unix Epoch. The timestamp is stored in milliseconds because some blockchains produce blocks more often than once a second.
  */
 export type Timestamp = number;
-
 /**
  * PublicKey contains a public key byte array for a particular CurveType encoded in hex. Note that there is no PrivateKey struct as this is NEVER the concern of an implementation.
  */
@@ -318,6 +302,7 @@ export type SignatureType =
   | "ed25519"
   | "schnorr_1"
   | "schnorr_poseidon";
+
 /**
  * CoinActions are different state changes that a Coin can undergo. When a Coin is created, it is coin_created. When a Coin is spent, it is coin_spent. It is assumed that a single Coin cannot be created or spent more than once.
  */
@@ -340,59 +325,12 @@ export interface CoinChange {
   coin_identifier: CoinIdentifier;
   coin_action: CoinAction;
 }
-
 /**
  * Coin contains its unique identifier and the amount it represents.
  */
 export interface Coin {
   coin_identifier: CoinIdentifier;
   amount: Amount;
-}
-/**
- * BalanceExemption indicates that the balance for an exempt account could change without a corresponding Operation. This typically occurs with staking rewards, vesting balances, and Currencies with a dynamic supply. Currently, it is possible to exempt an account from strict reconciliation by SubAccountIdentifier.Address or by Currency. This means that any account with SubAccountIdentifier.Address would be exempt or any balance of a particular Currency would be exempt, respectively. BalanceExemptions should be used sparingly as they may introduce significant complexity for integrators that attempt to reconcile all account balance changes. If your implementation relies on any BalanceExemptions, you MUST implement historical balance lookup (the ability to query an account balance at any BlockIdentifier).
- */
-export interface BalanceExemption {
-  /**
-   * SubAccountAddress is the SubAccountIdentifier.Address that the BalanceExemption applies to (regardless of the value of SubAccountIdentifier.Metadata).
-   */
-  sub_account_address?: string;
-  currency?: Currency;
-  exemption_type?: ExemptionType;
-}
-
-/**
- * ExemptionType is used to indicate if the live balance for an account subject to a BalanceExemption could increase above, decrease below, or equal the computed balance. * greater_or_equal: The live balance may increase above or equal the computed balance. This typically   occurs with staking rewards that accrue on each block. * less_or_equal: The live balance may decrease below or equal the computed balance. This typically   occurs as balance moves from locked to spendable on a vesting account. * dynamic: The live balance may increase above, decrease below, or equal the computed balance. This   typically occurs with tokens that have a dynamic supply.
- */
-export type ExemptionType = "greater_or_equal" | "less_or_equal" | "dynamic";
-
-/**
- * BlockEvent represents the addition or removal of a BlockIdentifier from storage. Streaming BlockEvents allows lightweight clients to update their own state without needing to implement their own syncing logic.
- */
-export interface BlockEvent {
-  /**
-   * sequence is the unique identifier of a BlockEvent within the context of a NetworkIdentifier.
-   */
-  sequence: number;
-  block_identifier: BlockIdentifier;
-  type: BlockEventType;
-}
-
-/**
- * BlockEventType determines if a BlockEvent represents the addition or removal of a block.
- */
-export type BlockEventType = "block_added" | "block_removed";
-
-/**
- * Operator is used by query-related endpoints to determine how to apply conditions. If this field is not populated, the default `and` value will be used.
- */
-export type Operator = "or" | "and";
-
-/**
- * BlockTransaction contains a populated Transaction and the BlockIdentifier that contains it.
- */
-export interface BlockTransaction {
-  block_identifier: BlockIdentifier;
-  transaction: Transaction;
 }
 
 /**
@@ -402,14 +340,10 @@ export interface AccountBalanceRequest {
   network_identifier: NetworkIdentifier;
   account_identifier: AccountIdentifier;
   block_identifier?: PartialBlockIdentifier;
-  /**
-   * In some cases, the caller may not want to retrieve all available balances for an AccountIdentifier. If the currencies field is populated, only balances for the specified currencies will be returned. If not populated, all available balances will be returned.
-   */
-  currencies?: Currency[];
 }
 
 /**
- * An AccountBalanceResponse is returned on the /account/balance endpoint. If an account has a balance for each AccountIdentifier describing it (ex: an ERC-20 token balance on a few smart contracts), an account balance request must be made with each AccountIdentifier. The `coins` field was removed and replaced by by `/account/coins` in `v1.4.7`.
+ * An AccountBalanceResponse is returned on the /account/balance endpoint. If an account has a balance for each AccountIdentifier describing it (ex: an ERC-20 token balance on a few smart contracts), an account balance request must be made with each AccountIdentifier.
  */
 export interface AccountBalanceResponse {
   block_identifier: BlockIdentifier;
@@ -418,36 +352,9 @@ export interface AccountBalanceResponse {
    */
   balances: Amount[];
   /**
-   * Account-based blockchains that utilize a nonce or sequence number should include that number in the metadata. This number could be unique to the identifier or global across the account address.
-   */
-  metadata?: { [key: string]: any };
-}
-
-/**
- * AccountCoinsRequest is utilized to make a request on the /account/coins endpoint.
- */
-export interface AccountCoinsRequest {
-  network_identifier: NetworkIdentifier;
-  account_identifier: AccountIdentifier;
-  /**
-   * Include state from the mempool when looking up an account's unspent coins. Note, using this functionality breaks any guarantee of idempotency.
-   */
-  include_mempool: boolean;
-  /**
-   * In some cases, the caller may not want to retrieve coins for all currencies for an AccountIdentifier. If the currencies field is populated, only coins for the specified currencies will be returned. If not populated, all unspent coins will be returned.
-   */
-  currencies?: Currency[];
-}
-
-/**
- * AccountCoinsResponse is returned on the /account/coins endpoint and includes all unspent Coins owned by an AccountIdentifier.
- */
-export interface AccountCoinsResponse {
-  block_identifier: BlockIdentifier;
-  /**
    * If a blockchain is UTXO-based, all unspent Coins owned by an account_identifier should be returned alongside the balance. It is highly recommended to populate this field so that users of the Rosetta API implementation don't need to maintain their own indexer to track their UTXOs.
    */
-  coins: Coin[];
+  coins?: Coin[];
   /**
    * Account-based blockchains that utilize a nonce or sequence number should include that number in the metadata. This number could be unique to the identifier or global across the account address.
    */
@@ -518,6 +425,7 @@ export interface MempoolTransactionResponse {
 export interface MetadataRequest {
   metadata?: { [key: string]: any };
 }
+
 /**
  * A NetworkListResponse contains all NetworkIdentifiers that the node can serve information for.
  */
@@ -554,14 +462,14 @@ export interface NetworkOptionsResponse {
 }
 
 /**
- * A ConstructionMetadataRequest is utilized to get information required to construct a transaction. The Options object used to specify which metadata to return is left purposely unstructured to allow flexibility for implementers. Options is not required in the case that there is network-wide metadata of interest. Optionally, the request can also include an array of PublicKeys associated with the AccountIdentifiers returned in ConstructionPreprocessResponse.
+ * A ConstructionMetadataRequest is utilized to get information required to construct a transaction. The Options object used to specify which metadata to return is left purposely unstructured to allow flexibility for implementers. Optionally, the request can also include an array of PublicKeys associated with the AccountIdentifiers returned in ConstructionPreprocessResponse.
  */
 export interface ConstructionMetadataRequest {
   network_identifier: NetworkIdentifier;
   /**
    * Some blockchains require different metadata for different types of transaction construction (ex: delegation versus a transfer). Instead of requiring a blockchain node to return all possible types of metadata for construction (which may require multiple node fetches), the client can populate an options object to limit the metadata returned to only the subset required.
    */
-  options?: { [key: string]: any };
+  options: { [key: string]: any };
   public_keys?: PublicKey[];
 }
 
@@ -649,6 +557,7 @@ export interface ConstructionCombineRequest {
 export interface ConstructionCombineResponse {
   signed_transaction: string;
 }
+
 /**
  * ConstructionParseRequest is the input to the `/construction/parse` endpoint. It allows the caller to parse either an unsigned or signed transaction.
  */
@@ -702,118 +611,6 @@ export interface TransactionIdentifierResponse {
 }
 
 /**
- * CallRequest is the input to the `/call` endpoint.
- */
-export interface CallRequest {
-  network_identifier: NetworkIdentifier;
-  /**
-   * Method is some network-specific procedure call. This method could map to a network-specific RPC endpoint, a method in an SDK generated from a smart contract, or some hybrid of the two. The implementation must define all available methods in the Allow object. However, it is up to the caller to determine which parameters to provide when invoking `/call`.
-   */
-  method: string;
-  /**
-   * Parameters is some network-specific argument for a method. It is up to the caller to determine which parameters to provide when invoking `/call`.
-   */
-  parameters: { [key: string]: any };
-}
-
-/**
- * CallResponse contains the result of a `/call` invocation.
- */
-export interface CallResponse {
-  /**
-   * Result contains the result of the `/call` invocation. This result will not be inspected or interpreted by Rosetta tooling and is left to the caller to decode.
-   */
-  result: { [key: string]: any };
-  /**
-   * Idempotent indicates that if `/call` is invoked with the same CallRequest again, at any point in time, it will return the same CallResponse. Integrators may cache the CallResponse if this is set to true to avoid making unnecessary calls to the Rosetta implementation. For this reason, implementers should be very conservative about returning true here or they could cause issues for the caller.
-   */
-  idempotent: boolean;
-}
-
-/**
- * EventsBlocksRequest is utilized to fetch a sequence of BlockEvents indicating which blocks were added and removed from storage to reach the current state.
- */
-export interface EventsBlocksRequest {
-  network_identifier: NetworkIdentifier;
-  /**
-   * offset is the offset into the event stream to sync events from. If this field is not populated, we return the limit events backwards from tip. If this is set to 0, we start from the beginning.
-   */
-  offset?: number;
-  /**
-   * limit is the maximum number of events to fetch in one call. The implementation may return <= limit events.
-   */
-  limit?: number;
-}
-
-/**
- * EventsBlocksResponse contains an ordered collection of BlockEvents and the max retrievable sequence.
- */
-export interface EventsBlocksResponse {
-  /**
-   * max_sequence is the maximum available sequence number to fetch.
-   */
-  max_sequence: number;
-  /**
-   * events is an array of BlockEvents indicating the order to add and remove blocks to maintain a canonical view of blockchain state. Lightweight clients can use this event stream to update state without implementing their own block syncing logic.
-   */
-  events: BlockEvent[];
-}
-
-/**
- * SearchTransactionsRequest is used to search for transactions matching a set of provided conditions in canonical blocks.
- */
-export interface SearchTransactionsRequest {
-  network_identifier: NetworkIdentifier;
-  operator?: Operator;
-  /**
-   * max_block is the largest block index to consider when searching for transactions. If this field is not populated, the current block is considered the max_block. If you do not specify a max_block, it is possible a newly synced block will interfere with paginated transaction queries (as the offset could become invalid with newly added rows).
-   */
-  max_block?: number;
-  /**
-   * offset is the offset into the query result to start returning transactions. If any search conditions are changed, the query offset will change and you must restart your search iteration.
-   */
-  offset?: number;
-  /**
-   * limit is the maximum number of transactions to return in one call. The implementation may return <= limit transactions.
-   */
-  limit?: number;
-  transaction_identifier?: TransactionIdentifier;
-  account_identifier?: AccountIdentifier;
-  coin_identifier?: CoinIdentifier;
-  currency?: Currency;
-  /**
-   * status is the network-specific operation type.
-   */
-  status?: string;
-  /**
-   * type is the network-specific operation type.
-   */
-  type?: string;
-  /**
-   * address is AccountIdentifier.Address. This is used to get all transactions related to an AccountIdentifier.Address, regardless of SubAccountIdentifier.
-   */
-  address?: string;
-  /**
-   * success is a synthetic condition populated by parsing network-specific operation statuses (using the mapping provided in `/network/options`).
-   */
-  success?: boolean;
-}
-
-/**
- * SearchTransactionsResponse contains an ordered collection of BlockTransactions that match the query in SearchTransactionsRequest. These BlockTransactions are sorted from most recent block to oldest block.
- */
-export interface SearchTransactionsResponse {
-  /**
-   * next_offset is the next offset to use when paginating through transaction results. If this field is not populated, there are no more transactions to query.
-   */
-  next_offset?: number;
-  /**
-   * transactions is an array of BlockTransactions sorted by most recent BlockIdentifier (meaning that transactions in recent blocks appear first). If there are many transactions for a particular search, transactions may not contain all matching transactions. It is up to the caller to paginate these transactions using the max_block field.
-   */
-  transactions: BlockTransaction[];
-}
-
-/**
  * Instead of utilizing HTTP status codes to describe node errors (which often do not have a good analog), rich errors are returned using this object. Both the code and message fields can be individually used to correctly identify an error. Implementations MUST use unique values for both fields.
  */
 export interface Error {
@@ -825,10 +622,6 @@ export interface Error {
    * Message is a network-specific error message. The message MUST NOT change for a given code. In particular, this means that any contextual information should be included in the details field.
    */
   message: string;
-  /**
-   * Description allows the implementer to optionally provide additional information about an error. In many cases, the content of this field will be a copy-and-paste from existing developer documentation. Description can ONLY be populated with generic information about a particular type of error. It MUST NOT be populated with information about a particular instantiation of an error (use `details` for this). Whereas the content of Error.Message should stay stable across releases, the content of Error.Description will likely change across releases (as implementers improve error documentation). For this reason, the content in this field is not part of any type assertion (unlike Error.Message).
-   */
-  description?: string;
   /**
    * An error is retriable if the same request may succeed if submitted again.
    */
