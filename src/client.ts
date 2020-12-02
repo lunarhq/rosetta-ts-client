@@ -4,7 +4,7 @@ import * as utils from "./utils";
 
 interface RosettaClientParams {
   baseUrl?: string;
-  headers: {
+  headers?: {
     [key: string]: string;
   };
 }
