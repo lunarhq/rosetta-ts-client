@@ -40,22 +40,6 @@ export class RosettaClient {
     }
   };
 
-  accountCoins = async (
-    req: rosetta.AccountCoinsRequest
-  ): Promise<rosetta.AccountCoinsResponse> => {
-    try {
-      const response = await axios.post(
-        `${this._baseUrl}/account/coins`,
-        req,
-        utils.setCustomHeaders(this._headers)
-      );
-      const data: rosetta.AccountCoinsResponse = response.data;
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
   block = async (req: rosetta.BlockRequest): Promise<rosetta.BlockResponse> => {
     try {
       const response = await axios.post(
@@ -204,14 +188,14 @@ export class RosettaClient {
 
   hash = async (
     req: rosetta.ConstructionHashRequest
-  ): Promise<rosetta.TransactionIdentifierResponse> => {
+  ): Promise<rosetta.ConstructionHashResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/hash`,
         req,
         utils.setCustomHeaders(this._headers)
       );
-      const data: rosetta.TransactionIdentifierResponse = response.data;
+      const data: rosetta.ConstructionHashResponse = response.data;
 
       return data;
     } catch (error) {
@@ -289,14 +273,14 @@ export class RosettaClient {
 
   submit = async (
     req: rosetta.ConstructionSubmitRequest
-  ): Promise<rosetta.TransactionIdentifierResponse> => {
+  ): Promise<rosetta.ConstructionSubmitResponse> => {
     try {
       const response = await axios.post(
         `${this._baseUrl}/construction/submit`,
         req,
         utils.setCustomHeaders(this._headers)
       );
-      const data: rosetta.TransactionIdentifierResponse = response.data;
+      const data: rosetta.ConstructionSubmitResponse = response.data;
 
       return data;
     } catch (error) {
