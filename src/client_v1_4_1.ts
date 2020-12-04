@@ -1,7 +1,7 @@
 import axios from "axios";
-import { RosettaClientVersion1_4_1 } from "./client_v1_4_1";
 import * as rosetta from "./types/rosetta";
 import * as utils from "./utils";
+import { RosettaClient } from "src/client";
 
 interface RosettaClientParams {
   baseUrl?: string;
@@ -10,13 +10,16 @@ interface RosettaClientParams {
   };
 }
 
-export class RosettaClient {
+export class RosettaClientVersion1_4_1 {
   _baseUrl: string;
   _headers: { [key: string]: string };
 
-  constructor(params?: RosettaClientParams) {
-    this._baseUrl = params?.baseUrl ?? "https://api.lunar.dev/v1/";
-    this._headers = params?.headers ?? {};
+  constructor({
+    baseUrl = "https://api.lunar.dev/v1/",
+    headers = {},
+  }: RosettaClientParams) {
+    this._baseUrl = baseUrl;
+    this._headers = headers;
   }
 
   setVersion(
@@ -38,22 +41,6 @@ export class RosettaClient {
         req
       );
       const data: rosetta.AccountBalanceResponse = response.data;
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  accountCoins = async (
-    req: rosetta.AccountCoinsRequest
-  ): Promise<rosetta.AccountCoinsResponse> => {
-    try {
-      const response = await axios.post(
-        `${this._baseUrl}/account/coins`,
-        req,
-        utils.setCustomHeaders(this._headers)
-      );
-      const data: rosetta.AccountCoinsResponse = response.data;
       return data;
     } catch (error) {
       return Promise.reject(error);
