@@ -14,7 +14,7 @@ export class RosettaClient {
   _headers: { [key: string]: string };
 
   constructor(params?: RosettaClientParams) {
-    this._baseUrl = params?.baseUrl ?? "https://api.lunar.dev/v1/";
+    this._baseUrl = params?.baseUrl ?? "https://api.lunar.dev/v1";
     this._headers = params?.headers ?? {};
   }
 
