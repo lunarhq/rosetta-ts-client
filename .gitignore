@@ -2,4 +2,3 @@ node_modules
 .idea
 
 src/types/rosetta.d.ts
-lib
