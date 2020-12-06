@@ -1,5 +1,4 @@
 import axios from "axios";
-import { RosettaClientVersion1_4_1 } from "./client_v1_4_1";
 import * as rosetta from "./types/rosetta";
 import * as utils from "./utils";
 
@@ -17,12 +16,6 @@ export class RosettaClient {
   constructor(params?: RosettaClientParams) {
     this._baseUrl = params?.baseUrl ?? "https://api.lunar.dev/v1/";
     this._headers = params?.headers ?? {};
-  }
-
-  setVersion(
-    version: utils.RosettaVersion
-  ): RosettaClient | RosettaClientVersion1_4_1 {
-    return utils.setVersion(version, this._baseUrl, this._headers);
   }
 
   /**********************************************
