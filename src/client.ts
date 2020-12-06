@@ -31,7 +31,8 @@ export class RosettaClient {
     try {
       const response = await axios.post(
         `${this._baseUrl}/account/balance`,
-        req
+        req,
+        utils.setCustomHeaders(this._headers)
       );
       const data: rosetta.AccountBalanceResponse = response.data;
       return data;
