@@ -1,6 +1,6 @@
 {
   "name": "@lunarhq/rosetta-ts-client",
-  "version": "0.0.2",
+  "version": "1.4.8-rc.1",
   "main": "lib/index",
   "types": "lib/index",
   "license": "MIT",
