@@ -3,7 +3,7 @@ import * as rosetta from "./types/rosetta";
 import * as utils from "./utils";
 
 interface RosettaClientParams {
-  baseUrl?: string;
+  baseUrl: string;
   headers?: {
     [key: string]: string;
   };
@@ -13,8 +13,8 @@ export class RosettaClient {
   _baseUrl: string;
   _headers: { [key: string]: string };
 
-  constructor(params?: RosettaClientParams) {
-    this._baseUrl = params?.baseUrl ?? "https://api.lunar.dev/v1";
+  constructor(params: RosettaClientParams) {
+    this._baseUrl = params?.baseUrl;
     this._headers = params?.headers ?? {};
   }
 

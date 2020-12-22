@@ -27,9 +27,8 @@ import { RosettaClient } from '@lunarhq/rosetta-ts-client';
 
 /**
  * Initialize Client
- * RosettaClient params are optional
  */ 
-const baseUrl = 'https://api.lunar.dev/v1/';
+const baseUrl = 'https://api.lunar.dev/v1';
 const headers = {
   'X-Api-Key': 'XXXXXXXXXX'
 }
